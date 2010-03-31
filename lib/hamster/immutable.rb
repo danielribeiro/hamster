@@ -18,12 +18,12 @@ module Hamster
       end
 
       def method_added(name)
-        wrap_method_in_transform(name) if /^(.*)!$/ === name
+        wrap_method_in_transform!(name) if /^(.*)!$/ === name
       end
 
       private
 
-      def wrap_method_in_transform(name)
+      def wrap_method_in_transform!(name)
         original = :"___#{$1}_bang___"
         return if method_defined?(original)
         alias_method original, name
@@ -47,8 +47,8 @@ METHOD
         frozen?
       end
 
-      alias_method :__copy__, :dup
-      private :__copy__
+      alias_method :__immutable_dup__, :dup
+      private :__immutable_dup__
 
       def dup
         self
@@ -62,7 +62,7 @@ METHOD
       end
 
       def transform(&block)
-        __copy__.tap { |copy| copy.instance_eval(&block) }.freeze
+        __immutable_dup__.tap { |copy| copy.instance_eval(&block) }.freeze
       end
 
     end

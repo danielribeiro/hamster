@@ -8,12 +8,14 @@ describe Hamster::Immutable do
 
     class Person < Struct.new(:first, :last)
       include Hamster::Immutable
-      public :transform
+      def set_first(name)
+        transform { self.first = name }
+      end
     end
 
     before do
       @original = Person.new("Simon", "Harris")
-      @result = @original.transform { self.first = "Sampy" }
+      @result = @original.set_first("Sampy")
     end
 
     it "preserves the original" do
