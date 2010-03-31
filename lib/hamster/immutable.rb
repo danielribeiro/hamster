@@ -18,12 +18,7 @@ module Hamster
       end
 
       def method_added(name)
-        wrap_method_in_transform!(name) if /^(.*)!$/ === name
-      end
-
-      private
-
-      def wrap_method_in_transform!(name)
+        return unless /^(.*)!$/ === name
         original = :"___#{$1}_bang___"
         return if method_defined?(original)
         alias_method original, name
