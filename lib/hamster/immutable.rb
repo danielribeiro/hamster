@@ -20,7 +20,7 @@ module Hamster
       def method_added(name)
         return unless /^(.*)!$/ === name
         original = :"___#{$1}_bang___"
-        return if method_defined?(original)
+        return if method_defined?(original) || private_method_defined?(original)
         alias_method original, name
         module_eval(<<-METHOD, "(__IMMUTABLE__)", 1)
 def #{name}(*args, &block)
