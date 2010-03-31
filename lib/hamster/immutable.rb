@@ -17,6 +17,21 @@ module Hamster
         super.freeze
       end
 
+      def method_added(name)
+        return unless /^(.*)!$/ === name
+        original = :"___#{$1}_bang___"
+        return if method_defined?(original)
+        alias_method original, name
+        module_eval(<<-METHOD, "(__IMMUTABLE__)", 1)
+def #{name}(*args, &block)
+  transform { #{original}(*args, &block) }
+rescue Exception
+  $@.delete_if{ |s| /^\\(__IMMUTABLE__\\):/ =~ s}
+  Kernel::raise
+end
+METHOD
+      end
+
     end
 
     module InstanceMethods
